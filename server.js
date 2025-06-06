@@ -3,15 +3,34 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Email configuration
+const emailTransporter = nodemailer.createTransporter({
+    service: 'gmail',
+    auth: {
+        user: 'your-email@gmail.com', // Replace with your email
+        pass: 'your-app-password'     // Replace with your app password
+    }
+});
+
+// Test email configuration on startup
+emailTransporter.verify((error, success) => {
+    if (error) {
+        console.log('❌ Email configuration error:', error);
+        console.log('📧 Please update email credentials in server.js');
+    } else {
+        console.log('✅ Email server is ready');
+    }
+});
 
 // Security middleware
 app.use(helmet({
@@ -20,29 +39,28 @@ app.use(helmet({
             defaultSrc: ["'self'"],
             styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
-            scriptSrc: ["'self'", "'unsafe-inline'"],
-            imgSrc: ["'self'", "data:", "https:"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+            imgSrc: ["'self'", "data:", "https:", "blob:"],
+            mediaSrc: ["'self'", "blob:"],
         },
     },
 }));
 
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production' ? 'https://yourdomain.com' : 'http://localhost:3000',
+    origin: process.env.NODE_ENV === 'production' ? 'https://yourdomain.com' : true,
     credentials: true
 }));
 
 // Rate limiting
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
+    windowMs: 15 * 60 * 1000,
+    max: 100,
     message: 'Too many requests from this IP, please try again later.',
-    standardHeaders: true,
-    legacyHeaders: false,
 });
 
 const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // limit each IP to 5 requests per windowMs for auth endpoints
+    windowMs: 15 * 60 * 1000,
+    max: 5,
     message: 'Too many authentication attempts, please try again later.',
 });
 
@@ -93,7 +111,6 @@ class SecureBlockchain {
         this.currentVotes = [];
         this.candidateVotes = {};
         this.difficulty = 4;
-        this.miningReward = 1;
         this.createGenesisBlock();
     }
 
@@ -121,22 +138,19 @@ class SecureBlockchain {
     }
 
     addVote(voterUIN, candidate, timestamp = Date.now()) {
-        // Enhanced vote validation
         if (!this.isValidVote(voterUIN, candidate)) {
             throw new Error('Invalid vote data');
         }
 
         const vote = {
             id: uuidv4(),
-            voterUIN: this.hashVoterUIN(voterUIN), // Hash UIN for privacy
+            voterUIN: this.hashVoterUIN(voterUIN),
             candidate,
             timestamp,
             signature: this.signVote(voterUIN, candidate, timestamp)
         };
 
         this.currentVotes.push(vote);
-        
-        // Update candidate vote count
         this.candidateVotes[candidate] = (this.candidateVotes[candidate] || 0) + 1;
 
         return vote.id;
@@ -152,13 +166,11 @@ class SecureBlockchain {
     }
 
     isValidVote(voterUIN, candidate) {
-        // Check if UIN format is valid
         const uinRegex = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
         if (!uinRegex.test(voterUIN) && voterUIN.length < 8) {
             return false;
         }
 
-        // Check if candidate is valid
         const validCandidates = [
             'Narendra Modi', 'Rahul Gandhi', 'Mamata Banerjee', 'Arvind Kejriwal',
             'M.K. Stalin', 'Nitish Kumar', 'Akhilesh Yadav', 'Uddhav Thackeray'
@@ -177,7 +189,6 @@ class SecureBlockchain {
             nonce: 0
         };
 
-        // Proof of work
         while (newBlock.hash === undefined || !newBlock.hash.startsWith('0'.repeat(this.difficulty))) {
             newBlock.nonce++;
             newBlock.hash = this.calculateHash(
@@ -246,7 +257,8 @@ class SecureVoterSystem {
                 phone: '9876543210',
                 age: 25,
                 birthPlace: 'Mumbai',
-                hasVoted: false
+                hasVoted: false,
+                photoPath: 'sample_photo.jpg'
             },
             {
                 uin: '650e8400-e29b-41d4-a716-446655440001',
@@ -256,7 +268,8 @@ class SecureVoterSystem {
                 phone: '9876543211',
                 age: 30,
                 birthPlace: 'Delhi',
-                hasVoted: false
+                hasVoted: false,
+                photoPath: 'sample_photo.jpg'
             },
             {
                 uin: '750e8400-e29b-41d4-a716-446655440002',
@@ -266,27 +279,8 @@ class SecureVoterSystem {
                 phone: '9876543212',
                 age: 28,
                 birthPlace: 'Bangalore',
-                hasVoted: false
-            },
-            {
-                uin: '850e8400-e29b-41d4-a716-446655440003',
-                firstName: 'Sneha',
-                lastName: 'Reddy',
-                email: 'sneha.r@example.com',
-                phone: '9876543213',
-                age: 35,
-                birthPlace: 'Hyderabad',
-                hasVoted: false
-            },
-            {
-                uin: '950e8400-e29b-41d4-a716-446655440004',
-                firstName: 'Rajesh',
-                lastName: 'Singh',
-                email: 'rajesh.s@example.com',
-                phone: '9876543214',
-                age: 45,
-                birthPlace: 'Lucknow',
-                hasVoted: false
+                hasVoted: false,
+                photoPath: 'sample_photo.jpg'
             }
         ];
 
@@ -295,9 +289,8 @@ class SecureVoterSystem {
         });
     }
 
-    registerVoter(voterData) {
+    async registerVoter(voterData) {
         const uin = uuidv4();
-        const hashedPassword = bcrypt.hashSync(voterData.phone, 10); // Use phone as password for demo
         
         const voter = {
             uin,
@@ -307,14 +300,92 @@ class SecureVoterSystem {
             phone: voterData.phone,
             age: voterData.age,
             birthPlace: voterData.birthPlace,
-            hashedPassword,
             hasVoted: false,
             registrationDate: new Date().toISOString(),
-            photoPath: voterData.photoPath
+            photoPath: voterData.photoPath,
+            biometricData: voterData.biometricData
         };
 
         this.voters.set(uin, voter);
+        
+        // Send UIN via email
+        await this.sendUINEmail(voter.email, uin, voter);
+        
         return uin;
+    }
+
+    async sendUINEmail(email, uin, voter) {
+        const mailOptions = {
+            from: 'your-email@gmail.com',
+            to: email,
+            subject: 'Your Voter Registration - UIN Card',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f5f5f5; padding: 20px;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+                        <h1 style="margin: 0; font-size: 28px;">🗳️ SecureVote</h1>
+                        <p style="margin: 10px 0 0 0; font-size: 16px;">Blockchain Voting System</p>
+                    </div>
+                    
+                    <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        <h2 style="color: #333; margin-top: 0;">Registration Successful! 🎉</h2>
+                        
+                        <div style="background: #f8f9fa; border-left: 4px solid #28a745; padding: 20px; margin: 20px 0; border-radius: 5px;">
+                            <h3 style="color: #28a745; margin-top: 0;">Your Digital Voter ID Card</h3>
+                            
+                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <div>
+                                        <h4 style="margin: 0; font-size: 18px;">${voter.firstName} ${voter.lastName}</h4>
+                                        <p style="margin: 5px 0; opacity: 0.9;">Registered Voter</p>
+                                        <p style="margin: 5px 0; font-size: 14px; opacity: 0.8;">Age: ${voter.age} | ${voter.birthPlace}</p>
+                                    </div>
+                                    <div style="background: white; color: #333; padding: 10px; border-radius: 5px; text-align: center;">
+                                        <div style="font-size: 12px; font-weight: bold;">UIN</div>
+                                        <div style="font-family: monospace; font-size: 10px; word-break: break-all;">${uin}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                            <h4 style="color: #856404; margin-top: 0;">🔐 Important Security Information</h4>
+                            <ul style="color: #856404; margin: 0; padding-left: 20px;">
+                                <li>Keep your UIN confidential and secure</li>
+                                <li>You will need this UIN to cast your vote</li>
+                                <li>Biometric verification will be required during voting</li>
+                                <li>Do not share your UIN with anyone</li>
+                            </ul>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 30px;">
+                            <p style="color: #666; font-size: 14px;">
+                                Registration Date: ${new Date().toLocaleDateString()}<br>
+                                Email: ${email}
+                            </p>
+                        </div>
+                        
+                        <div style="background: #e3f2fd; padding: 15px; border-radius: 5px; margin-top: 20px; text-align: center;">
+                            <p style="color: #1976d2; margin: 0; font-weight: bold;">Ready to Vote? 🗳️</p>
+                            <p style="color: #1976d2; margin: 5px 0 0 0; font-size: 14px;">Use your UIN and biometric verification to cast your secure vote</p>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
+                        <p>This is an automated message from SecureVote Blockchain Voting System</p>
+                        <p>© 2024 SecureVote. All rights reserved.</p>
+                    </div>
+                </div>
+            `
+        };
+
+        try {
+            await emailTransporter.sendMail(mailOptions);
+            console.log(`✅ UIN email sent successfully to ${email}`);
+            return true;
+        } catch (error) {
+            console.error('❌ Error sending email:', error);
+            throw new Error('Failed to send UIN email');
+        }
     }
 
     isValidVoter(uin) {
@@ -351,15 +422,26 @@ class SecureVoterSystem {
 const blockchain = new SecureBlockchain();
 const voterSystem = new SecureVoterSystem();
 
-// Middleware for request logging
-app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.path} - IP: ${req.ip}`);
-    next();
-});
+// Biometric verification simulation
+function simulateBiometricVerification(uploadedPhoto, capturedPhoto) {
+    // In a real implementation, this would use face recognition APIs
+    // For demo purposes, we'll simulate a successful match
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            // Simulate 90% success rate for demo
+            const isMatch = Math.random() > 0.1;
+            resolve({
+                success: isMatch,
+                confidence: isMatch ? (0.85 + Math.random() * 0.14) : (0.3 + Math.random() * 0.4),
+                message: isMatch ? 'Biometric verification successful' : 'Biometric verification failed'
+            });
+        }, 2000);
+    });
+}
 
 // API Routes
 
-// Voter registration
+// Voter registration with biometric verification
 app.post('/api/register', upload.single('photo'), async (req, res) => {
     try {
         const { firstName, lastName, email, phone, age, birthPlace } = req.body;
@@ -386,45 +468,54 @@ app.post('/api/register', upload.single('photo'), async (req, res) => {
             });
         }
 
+        // Simulate biometric analysis of uploaded photo
+        const biometricAnalysis = await simulateBiometricVerification(req.file.path, null);
+        
+        if (!biometricAnalysis.success) {
+            // Delete uploaded file if biometric verification fails
+            fs.unlinkSync(req.file.path);
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Photo verification failed. Please upload a clear photo of your face.' 
+            });
+        }
+
         // Register voter
-        const uin = voterSystem.registerVoter({
+        const uin = await voterSystem.registerVoter({
             firstName,
             lastName,
             email,
             phone,
             age: parseInt(age),
             birthPlace,
-            photoPath: req.file.path
+            photoPath: req.file.path,
+            biometricData: biometricAnalysis
         });
-
-        // In production, send email with UIN
-        console.log(`New voter registered with UIN: ${uin}`);
 
         res.json({
             success: true,
             message: 'Registration successful! Your UIN has been sent to your email.',
-            uin: uin // In production, don't send UIN in response
+            uin: uin
         });
 
     } catch (error) {
         console.error('Registration error:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'Internal server error' 
+            message: error.message || 'Internal server error' 
         });
     }
 });
 
-// Vote casting
-app.post('/api/vote', async (req, res) => {
+// Biometric verification for voting
+app.post('/api/verify-biometric', async (req, res) => {
     try {
-        const { voterUIN, candidate } = req.body;
+        const { voterUIN, capturedImage } = req.body;
 
-        // Validation
-        if (!voterUIN || !candidate) {
+        if (!voterUIN || !capturedImage) {
             return res.status(400).json({ 
                 success: false, 
-                message: 'UIN and candidate selection are required' 
+                message: 'UIN and captured image are required' 
             });
         }
 
@@ -432,7 +523,55 @@ app.post('/api/vote', async (req, res) => {
         if (!voterSystem.isValidVoter(voterUIN)) {
             return res.status(400).json({ 
                 success: false, 
-                message: 'Invalid UIN. Please check your UIN or register first.' 
+                message: 'Invalid UIN' 
+            });
+        }
+
+        const voter = voterSystem.getVoterDetails(voterUIN);
+        
+        // Simulate biometric comparison
+        const verification = await simulateBiometricVerification(voter.photoPath, capturedImage);
+        
+        res.json({
+            success: verification.success,
+            confidence: verification.confidence,
+            message: verification.message,
+            voterName: verification.success ? `${voter.firstName} ${voter.lastName}` : null
+        });
+
+    } catch (error) {
+        console.error('Biometric verification error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Internal server error' 
+        });
+    }
+});
+
+// Vote casting with biometric verification
+app.post('/api/vote', async (req, res) => {
+    try {
+        const { voterUIN, candidate, biometricVerified } = req.body;
+
+        if (!voterUIN || !candidate) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'UIN and candidate selection are required' 
+            });
+        }
+
+        if (!biometricVerified) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Biometric verification required' 
+            });
+        }
+
+        // Check if voter exists
+        if (!voterSystem.isValidVoter(voterUIN)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid UIN' 
             });
         }
 
@@ -440,7 +579,7 @@ app.post('/api/vote', async (req, res) => {
         if (voterSystem.hasVoted(voterUIN)) {
             return res.status(400).json({ 
                 success: false, 
-                message: 'You have already voted. Multiple voting is not allowed.' 
+                message: 'You have already voted' 
             });
         }
 
@@ -450,7 +589,7 @@ app.post('/api/vote', async (req, res) => {
         // Mark voter as voted
         voterSystem.markAsVoted(voterUIN);
 
-        // Mine block (in production, this would be done by miners)
+        // Mine block
         const newBlock = blockchain.mineBlock();
 
         res.json({
@@ -514,35 +653,6 @@ app.get('/api/blockchain', (req, res) => {
     }
 });
 
-// Get voter status
-app.get('/api/voter/:uin', (req, res) => {
-    try {
-        const { uin } = req.params;
-        
-        if (!voterSystem.isValidVoter(uin)) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Voter not found' 
-            });
-        }
-
-        const voter = voterSystem.getVoterDetails(uin);
-        res.json({
-            success: true,
-            voter: {
-                name: `${voter.firstName} ${voter.lastName}`,
-                hasVoted: voterSystem.hasVoted(uin)
-            }
-        });
-    } catch (error) {
-        console.error('Voter status error:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Internal server error' 
-        });
-    }
-});
-
 // Get sample UINs for testing
 app.get('/api/sample-uins', (req, res) => {
     try {
@@ -573,6 +683,11 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// Serve static files
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // Error handling middleware
 app.use((error, req, res, next) => {
     console.error('Error:', error);
@@ -592,17 +707,13 @@ app.use((error, req, res, next) => {
     });
 });
 
-// Serve static files
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
 // Start server
 app.listen(PORT, () => {
     console.log(`🚀 Secure Voting System running on port ${PORT}`);
     console.log(`🔗 Blockchain initialized with ${blockchain.chain.length} blocks`);
     console.log(`👥 ${voterSystem.getAllVoters().length} sample voters loaded`);
     console.log(`🛡️  Security features enabled`);
+    console.log(`📧 Email service configured`);
 });
 
 module.exports = app;

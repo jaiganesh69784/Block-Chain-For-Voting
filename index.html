@@ -140,23 +140,6 @@
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
-        .form-select {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1rem;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .form-select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
         .btn {
             display: inline-flex;
             align-items: center;
@@ -202,6 +185,11 @@
             background: #059669;
         }
 
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
         .alert {
             padding: 1rem;
             border-radius: 8px;
@@ -227,62 +215,19 @@
             border: 1px solid #fed7aa;
         }
 
-        .security-features {
-            background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .security-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .security-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            background: var(--secondary-color);
+        .photo-upload-section {
+            border: 2px dashed var(--border-color);
             border-radius: 8px;
-            border-left: 4px solid var(--accent-color);
+            padding: 1.5rem;
+            text-align: center;
+            background: var(--secondary-color);
         }
 
-        .security-item i {
-            font-size: 1.5rem;
-            color: var(--accent-color);
-            margin-right: 1rem;
-        }
-
-        .footer-actions {
+        .photo-upload-buttons {
             display: flex;
-            justify-content: center;
             gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .loading {
-            display: none;
-            align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            margin-top: 1rem;
         }
 
         .candidate-option {
@@ -329,22 +274,40 @@
             font-size: 0.875rem;
         }
 
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .container {
-                padding: 1rem;
-            }
-            
-            .footer-actions {
-                flex-direction: column;
-            }
+        .biometric-section {
+            background: #f0f9ff;
+            border: 2px solid #0ea5e9;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .biometric-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .loading {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .modal {
@@ -387,22 +350,78 @@
             color: var(--text-secondary);
         }
 
-        .verification-step {
+        .camera-container {
             text-align: center;
-            padding: 2rem 0;
         }
 
-        .verification-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: var(--gradient-primary);
+        .camera-video {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .camera-canvas {
+            display: none;
+        }
+
+        .footer-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .security-features {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .security-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 2rem;
-            color: white;
+            padding: 1rem;
+            background: var(--secondary-color);
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .security-item i {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            margin-right: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .footer-actions {
+                flex-direction: column;
+            }
+
+            .photo-upload-buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -410,17 +429,17 @@
     <div class="container">
         <div class="header">
             <h1><i class="fas fa-shield-alt"></i> SecureVote</h1>
-            <p>Blockchain-Powered Democratic Voting System</p>
+            <p>Blockchain-Powered Biometric Voting System</p>
         </div>
 
         <div class="security-features">
-            <h2><i class="fas fa-lock"></i> Security Features</h2>
+            <h2><i class="fas fa-lock"></i> Advanced Security Features</h2>
             <div class="security-grid">
                 <div class="security-item">
                     <i class="fas fa-fingerprint"></i>
                     <div>
                         <strong>Biometric Verification</strong>
-                        <p>Advanced identity verification</p>
+                        <p>Face recognition technology</p>
                     </div>
                 </div>
                 <div class="security-item">
@@ -490,8 +509,20 @@
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Photo ID</label>
-                        <input type="file" class="form-input" id="photo" accept="image/*" required>
+                        <label class="form-label">Photo ID (Biometric Verification)</label>
+                        <div class="photo-upload-section">
+                            <i class="fas fa-camera" style="font-size: 2rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+                            <p>Upload a clear photo of your face for biometric verification</p>
+                            <div class="photo-upload-buttons">
+                                <button type="button" class="btn btn-primary btn-small" id="take-photo-btn">
+                                    <i class="fas fa-camera"></i> Take Photo
+                                </button>
+                                <button type="button" class="btn btn-secondary btn-small" id="upload-photo-btn">
+                                    <i class="fas fa-upload"></i> Upload Photo
+                                </button>
+                            </div>
+                            <input type="file" id="photo" accept="image/*" style="display: none;" required>
+                        </div>
                     </div>
                     
                     <button type="submit" class="btn btn-primary" style="width: 100%;">
@@ -518,6 +549,21 @@
                     <div class="form-group">
                         <label class="form-label">Your UIN (Unique Identity Number)</label>
                         <input type="text" class="form-input" id="voterUIN" placeholder="Enter your UIN" required>
+                    </div>
+
+                    <div class="biometric-section">
+                        <div class="biometric-status">
+                            <span id="biometric-status">
+                                <i class="fas fa-times-circle" style="color: #ef4444;"></i> Biometric Required
+                            </span>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-small" id="verify-biometric-btn">
+                            <i class="fas fa-fingerprint"></i> Verify Biometric
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                <span>Verifying...</span>
+                            </div>
+                        </button>
                     </div>
                     
                     <div class="form-group">
@@ -558,7 +604,7 @@
                         <span class="btn-text"><i class="fas fa-check-circle"></i> Cast Vote</span>
                         <div class="loading">
                             <div class="spinner"></div>
-                            <span>Verifying...</span>
+                            <span>Processing...</span>
                         </div>
                     </button>
                 </form>
@@ -578,22 +624,56 @@
         </div>
     </div>
 
-    <!-- Verification Modal -->
+    <!-- Camera Modal for Registration -->
+    <div id="registration-camera-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Take Registration Photo</h3>
+                <button class="modal-close" onclick="closeCameraModal('registration')">&times;</button>
+            </div>
+            <div class="camera-container">
+                <video id="registration-video" class="camera-video" autoplay></video>
+                <canvas id="registration-canvas" class="camera-canvas"></canvas>
+                <button class="btn btn-primary" onclick="capturePhoto('registration')">
+                    <i class="fas fa-camera"></i> Capture Photo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Camera Modal for Verification -->
+    <div id="verification-camera-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Biometric Verification</h3>
+                <button class="modal-close" onclick="closeCameraModal('verification')">&times;</button>
+            </div>
+            <div class="camera-container">
+                <video id="verification-video" class="camera-video" autoplay></video>
+                <canvas id="verification-canvas" class="camera-canvas"></canvas>
+                <button class="btn btn-primary" onclick="capturePhoto('verification')">
+                    <i class="fas fa-fingerprint"></i> Verify Identity
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vote Verification Modal -->
     <div id="verification-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Vote Verification</h3>
+                <h3>Processing Vote</h3>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
-            <div class="verification-step">
-                <div class="verification-icon">
+            <div style="text-align: center; padding: 2rem;">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2rem; color: white;">
                     <i class="fas fa-shield-check"></i>
                 </div>
-                <h4>Verifying Your Identity</h4>
-                <p>Please wait while we verify your credentials and process your vote securely.</p>
+                <h4>Securing Your Vote</h4>
+                <p>Please wait while we process your vote and add it to the blockchain.</p>
                 <div class="loading" style="display: flex; margin-top: 1rem;">
                     <div class="spinner"></div>
-                    <span>Processing verification...</span>
+                    <span>Processing...</span>
                 </div>
             </div>
         </div>

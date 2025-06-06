@@ -1,12 +1,10 @@
 {
   "name": "blockchain-voting-system",
   "version": "1.0.0",
-  "description": "Modern blockchain-based voting system with enhanced security",
+  "description": "Modern blockchain-based voting system with biometric verification",
   "main": "server.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev": "node server.js",
     "start": "node server.js"
   },
   "dependencies": {
@@ -19,9 +17,8 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.7",
     "crypto": "^1.0.1",
-    "uuid": "^9.0.1"
-  },
-  "devDependencies": {
-    "vite": "^5.0.0"
+    "uuid": "^9.0.1",
+    "face-api.js": "^0.22.2",
+    "canvas": "^2.11.2"
   }
 }
