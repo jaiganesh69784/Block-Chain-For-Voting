@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureVote - Blockchain Voting System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #f8fafc;
+            --accent-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .register-icon {
+            background: var(--gradient-primary);
+        }
+
+        .vote-icon {
+            background: var(--gradient-secondary);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: #f1f5f9;
+            border-color: var(--primary-color);
+        }
+
+        .btn-success {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-warning {
+            background: #fffbeb;
+            color: #92400e;
+            border: 1px solid #fed7aa;
+        }
+
+        .security-features {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .security-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: var(--secondary-color);
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .security-item i {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            margin-right: 1rem;
+        }
+
+        .footer-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .loading {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .candidate-option {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .candidate-option:hover {
+            border-color: var(--primary-color);
+            background: #f8fafc;
+        }
+
+        .candidate-option.selected {
+            border-color: var(--primary-color);
+            background: #eff6ff;
+        }
+
+        .candidate-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+
+        .candidate-info h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .candidate-info p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .footer-actions {
+                flex-direction: column;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .verification-step {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .verification-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-shield-alt"></i> SecureVote</h1>
+            <p>Blockchain-Powered Democratic Voting System</p>
+        </div>
+
+        <div class="security-features">
+            <h2><i class="fas fa-lock"></i> Security Features</h2>
+            <div class="security-grid">
+                <div class="security-item">
+                    <i class="fas fa-fingerprint"></i>
+                    <div>
+                        <strong>Biometric Verification</strong>
+                        <p>Advanced identity verification</p>
+                    </div>
+                </div>
+                <div class="security-item">
+                    <i class="fas fa-link"></i>
+                    <div>
+                        <strong>Blockchain Security</strong>
+                        <p>Immutable vote records</p>
+                    </div>
+                </div>
+                <div class="security-item">
+                    <i class="fas fa-user-shield"></i>
+                    <div>
+                        <strong>Privacy Protection</strong>
+                        <p>Anonymous voting system</p>
+                    </div>
+                </div>
+                <div class="security-item">
+                    <i class="fas fa-ban"></i>
+                    <div>
+                        <strong>Double Vote Prevention</strong>
+                        <p>One person, one vote</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon register-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h2 class="card-title">Voter Registration</h2>
+                </div>
+                
+                <div id="register-alert" class="alert"></div>
+                
+                <form id="registration-form">
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <input type="text" class="form-input" id="firstName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-input" id="lastName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" id="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" class="form-input" id="phone" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Age</label>
+                        <input type="number" class="form-input" id="age" min="18" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Place of Birth</label>
+                        <input type="text" class="form-input" id="birthPlace" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Photo ID</label>
+                        <input type="file" class="form-input" id="photo" accept="image/*" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <span class="btn-text">Register to Vote</span>
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <span>Processing...</span>
+                        </div>
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon vote-icon">
+                        <i class="fas fa-vote-yea"></i>
+                    </div>
+                    <h2 class="card-title">Cast Your Vote</h2>
+                </div>
+                
+                <div id="vote-alert" class="alert"></div>
+                
+                <form id="voting-form">
+                    <div class="form-group">
+                        <label class="form-label">Your UIN (Unique Identity Number)</label>
+                        <input type="text" class="form-input" id="voterUIN" placeholder="Enter your UIN" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Select Your Candidate</label>
+                        <div id="candidates-list">
+                            <div class="candidate-option" data-candidate="Narendra Modi">
+                                <div class="candidate-avatar">NM</div>
+                                <div class="candidate-info">
+                                    <h4>Narendra Modi</h4>
+                                    <p>Bharatiya Janata Party (BJP)</p>
+                                </div>
+                            </div>
+                            <div class="candidate-option" data-candidate="Rahul Gandhi">
+                                <div class="candidate-avatar">RG</div>
+                                <div class="candidate-info">
+                                    <h4>Rahul Gandhi</h4>
+                                    <p>Indian National Congress (INC)</p>
+                                </div>
+                            </div>
+                            <div class="candidate-option" data-candidate="Mamata Banerjee">
+                                <div class="candidate-avatar">MB</div>
+                                <div class="candidate-info">
+                                    <h4>Mamata Banerjee</h4>
+                                    <p>All India Trinamool Congress (TMC)</p>
+                                </div>
+                            </div>
+                            <div class="candidate-option" data-candidate="Arvind Kejriwal">
+                                <div class="candidate-avatar">AK</div>
+                                <div class="candidate-info">
+                                    <h4>Arvind Kejriwal</h4>
+                                    <p>Aam Aadmi Party (AAP)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success" style="width: 100%;" disabled>
+                        <span class="btn-text"><i class="fas fa-check-circle"></i> Cast Vote</span>
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <span>Verifying...</span>
+                        </div>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="footer-actions">
+            <a href="#" class="btn btn-secondary" onclick="showResults()">
+                <i class="fas fa-chart-bar"></i> View Results
+            </a>
+            <a href="#" class="btn btn-secondary" onclick="showSampleUINs()">
+                <i class="fas fa-list"></i> Sample UINs
+            </a>
+            <a href="#" class="btn btn-secondary" onclick="showBlockchain()">
+                <i class="fas fa-cubes"></i> Blockchain Explorer
+            </a>
+        </div>
+    </div>
+
+    <!-- Verification Modal -->
+    <div id="verification-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Vote Verification</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="verification-step">
+                <div class="verification-icon">
+                    <i class="fas fa-shield-check"></i>
+                </div>
+                <h4>Verifying Your Identity</h4>
+                <p>Please wait while we verify your credentials and process your vote securely.</p>
+                <div class="loading" style="display: flex; margin-top: 1rem;">
+                    <div class="spinner"></div>
+                    <span>Processing verification...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
